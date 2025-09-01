@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Scraper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .card-header h1 {
+            margin: 0;
+            font-weight: 300;
+            font-size: 2.5rem;
+        }
+        
+        .card-header .subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 1rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .provider-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+            text-align: center;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .provider-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .provider-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+        
+        .provider-icon {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .provider-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .provider-description {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        .provider-card[data-provider="any_website"] {
+            border-color: #28a745;
+        }
+        
+        .provider-card[data-provider="any_website"]:hover {
+            border-color: #28a745;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.2);
+        }
+        
+        .provider-card[data-provider="any_website"].selected {
+            border-color: #28a745;
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%);
+        }
+        
+        .provider-card[data-provider="any_website"] .provider-icon {
+            color: #28a745;
+        }
+        
+        .provider-card[data-provider="mubawab"] {
+            border-color: #fd7e14;
+        }
+        
+        .provider-card[data-provider="mubawab"]:hover {
+            border-color: #fd7e14;
+            box-shadow: 0 3px 10px rgba(253, 126, 20, 0.2);
+        }
+        
+        .provider-card[data-provider="mubawab"].selected {
+            border-color: #fd7e14;
+            background: linear-gradient(135deg, rgba(253, 126, 20, 0.1) 0%, rgba(233, 136, 41, 0.1) 100%);
+        }
+        
+        .provider-card[data-provider="mubawab"] .provider-icon {
+            color: #fd7e14;
+        }
+        
+        .compact-form {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .compact-section {
+            margin-bottom: 2rem;
+        }
+        
+        .compact-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .alert {
+            border-radius: 15px;
+            border: none;
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg" style="background: rgba(102, 126, 234, 0.9);">
+        <div class="container">
+            <a class="navbar-brand" href="/" style="color: white; font-weight: 700;">
+                <i class="fas fa-home me-2"></i>Real Estate Tools
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link active" href="/" style="color: white;">
+                    <i class="fas fa-search me-1"></i>Web Scraper
+                </a>
+                <a class="nav-link" href="/manual" style="color: rgba(255, 255, 255, 0.8);">
+                    <i class="fas fa-edit me-1"></i>Manual Entry
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h1><i class="fas fa-home me-3"></i>Real Estate Scraper</h1>
+                        <p class="subtitle">Extract property data from real estate websites</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Error Messages -->
+                        {% if error %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+                        
+                        <form id="scraperForm" method="POST" action="/scrape" class="compact-form">
+                            <!-- Provider Selection -->
+                            <div class="compact-section">
+                                <label class="form-label h6 mb-2">
+                                    <i class="fas fa-globe me-2"></i>Select Website Provider
+                                </label>
+                                <div class="row d-flex align-items-stretch">
+                                    {% for provider_id, provider_info in providers.items() %}
+                                    <div class="col-md-4 col-sm-6 mb-2 d-flex">
+                                        <div class="provider-card w-100" data-provider="{{ provider_id }}">
+                                            <div class="provider-icon">
+                                                <i class="fas fa-{{ provider_info.icon if provider_info.icon else 'building' }}"></i>
+                                            </div>
+                                            <div class="provider-name">{{ provider_info.name }}</div>
+                                            <div class="provider-description">{{ provider_info.description }}</div>
+                                            {% if provider_info.domain != 'any' %}
+                                            <small class="text-muted d-block mt-1">{{ provider_info.domain }}</small>
+                                            {% else %}
+                                            <small class="text-success d-block mt-1"><i class="fas fa-star"></i> Universal</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <input type="hidden" name="provider" id="selectedProvider" required>
+                            </div>
+                            
+                            <!-- URL Input -->
+                            <div class="compact-section">
+                                <label for="url" class="form-label h6">
+                                    <i class="fas fa-link me-2"></i>Property URL
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-globe"></i>
+                                    </span>
+                                    <input type="url" class="form-control" id="url" name="url" 
+                                           placeholder="https://www.menzili.tn/annonce/..." required>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <span id="urlHelp">Paste the complete URL of the property listing you want to scrape</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                    <i class="fas fa-search me-2"></i>Scrape Property Data
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Loading Animation -->
+                        <div class="loading text-center p-4" id="loadingDiv">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 h5">Scraping property data...</p>
+                            <p class="text-muted">This may take a few seconds</p>
+                        </div>
+                        
+                        <!-- Manual Entry Alternative -->
+                        <div class="text-center mt-4 pt-4" style="border-top: 2px dashed #dee2e6;">
+                            <h5 class="text-muted mb-3">Or enter property details manually</h5>
+                            <a href="/manual" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-edit me-2"></i>Manual Property Entry
+                            </a>
+                            <p class="text-muted mt-2 small">
+                                Enter property details manually to get price predictions without scraping
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features Section -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-star me-2"></i>Features
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-bolt text-warning me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">Fast Extraction</h6>
+                                        <small class="text-muted">Quick property data extraction</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-shield-alt text-success me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">Reliable</h6>
+                                        <small class="text-muted">Consistent and accurate data</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-cogs text-info me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">Structured Data</h6>
+                                        <small class="text-muted">Clean, organized output</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Provider selection logic
+        document.querySelectorAll('.provider-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('selected'));
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                // Set hidden input value
+                document.getElementById('selectedProvider').value = this.dataset.provider;
+                
+                // Update URL placeholder based on provider
+                const provider = this.dataset.provider;
+                const urlInput = document.getElementById('url');
+                const urlHelp = document.getElementById('urlHelp');
+                
+                if (provider === 'menzili') {
+                    urlInput.placeholder = 'https://www.menzili.tn/annonce/...';
+                    urlHelp.textContent = 'Paste a Menzili.tn property URL';
+                } else if (provider === 'mubawab') {
+                    urlInput.placeholder = 'https://www.mubawab.tn/fr/ct/...';
+                    urlHelp.textContent = 'Paste a Mubawab.tn property URL';
+                } else if (provider === 'any_website') {
+                    urlInput.placeholder = 'https://any-website.com/property-page...';
+                    urlHelp.textContent = 'Paste any property URL from any real estate website';
+                } else {
+                    urlInput.placeholder = 'https://website.com/property...';
+                    urlHelp.textContent = 'Paste the complete URL of the property listing you want to scrape';
+                }
+            });
+        });
+        
+        // Form submission with loading animation
+        document.getElementById('scraperForm').addEventListener('submit', function(e) {
+            const provider = document.getElementById('selectedProvider').value;
+            if (!provider) {
+                e.preventDefault();
+                alert('Please select a website provider first');
+                return;
+            }
+            
+            // Show loading animation
+            document.getElementById('loadingDiv').classList.add('show');
+            document.getElementById('submitBtn').disabled = true;
+        });
+        
+        // URL validation
+        document.getElementById('url').addEventListener('input', function() {
+            const url = this.value;
+            const provider = document.getElementById('selectedProvider').value;
+            
+            if (provider && url && provider !== 'any_website') {
+                const providerDomain = {
+                    'menzili': 'menzili.tn',
+                    'mubawab': 'mubawab.tn'
+                }[provider];
+                
+                if (providerDomain && !url.includes(providerDomain)) {
+                    this.setCustomValidity(`URL must be from ${providerDomain}`);
+                } else {
+                    this.setCustomValidity('');
+                }
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>

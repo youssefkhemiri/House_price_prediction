@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Property Entry - Real Estate Scraper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: none;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 2rem;
+            text-align: center;
+            border: none;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .form-section h5 {
+            color: #495057;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .form-check {
+            background: white;
+            border-radius: 10px;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .form-check:hover {
+            border-color: #667eea;
+        }
+        
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg" style="background: rgba(102, 126, 234, 0.9);">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-home me-2"></i>Real Estate Tools
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-search me-1"></i>Web Scraper
+                </a>
+                <a class="nav-link active" href="/manual">
+                    <i class="fas fa-edit me-1"></i>Manual Entry
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-2">
+                            <i class="fas fa-edit me-3"></i>Manual Property Entry
+                        </h2>
+                        <p class="mb-0 opacity-75">Enter property details manually to get price predictions</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+                        </div>
+                        {% endif %}
+                        
+                        <form method="post" action="/manual-entry">
+                            <!-- Basic Information -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="property_type" class="form-label">Property Type *</label>
+                                        <select class="form-select" id="property_type" name="property_type" required>
+                                            <option value="">Select property type</option>
+                                            <option value="Maison">House (Maison)</option>
+                                            <option value="Appartement">Apartment</option>
+                                            <option value="Villa">Villa</option>
+                                            <option value="Duplex">Duplex</option>
+                                            <option value="Studio">Studio</option>
+                                            <option value="Terrain">Land</option>
+                                            <option value="Bureau">Office</option>
+                                            <option value="Local Commercial">Commercial Space</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="transaction_type" class="form-label">Transaction Type *</label>
+                                        <select class="form-select" id="transaction_type" name="transaction_type" required>
+                                            <option value="">Select transaction type</option>
+                                            <option value="Vente">Sale (Vente)</option>
+                                            <option value="Location">Rent (Location)</option>
+                                            <option value="Location saisonnière">Seasonal Rent</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label for="price" class="form-label">Price</label>
+                                        <input type="number" class="form-control" id="price" name="price" 
+                                               placeholder="Enter price (optional)">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="currency" class="form-label">Currency</label>
+                                        <select class="form-select" id="currency" name="currency">
+                                            <option value="DT">DT (Tunisian Dinar)</option>
+                                            <option value="EUR">EUR (Euro)</option>
+                                            <option value="USD">USD (Dollar)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Location Information -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-map-marker-alt me-2"></i>Location Information</h5>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="address" class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="address" name="address" 
+                                               placeholder="Enter full address">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="governorate" class="form-label">Governorate</label>
+                                        <select class="form-select" id="governorate" name="governorate">
+                                            <option value="">Select governorate</option>
+                                            <option value="Tunis">Tunis</option>
+                                            <option value="Ariana">Ariana</option>
+                                            <option value="Ben Arous">Ben Arous</option>
+                                            <option value="Manouba">Manouba</option>
+                                            <option value="Nabeul">Nabeul</option>
+                                            <option value="Zaghouan">Zaghouan</option>
+                                            <option value="Bizerte">Bizerte</option>
+                                            <option value="Béja">Béja</option>
+                                            <option value="Jendouba">Jendouba</option>
+                                            <option value="Kef">Kef</option>
+                                            <option value="Siliana">Siliana</option>
+                                            <option value="Sousse">Sousse</option>
+                                            <option value="Monastir">Monastir</option>
+                                            <option value="Mahdia">Mahdia</option>
+                                            <option value="Sfax">Sfax</option>
+                                            <option value="Kairouan">Kairouan</option>
+                                            <option value="Kasserine">Kasserine</option>
+                                            <option value="Sidi Bouzid">Sidi Bouzid</option>
+                                            <option value="Gabès">Gabès</option>
+                                            <option value="Medenine">Medenine</option>
+                                            <option value="Tataouine">Tataouine</option>
+                                            <option value="Gafsa">Gafsa</option>
+                                            <option value="Tozeur">Tozeur</option>
+                                            <option value="Kebili">Kebili</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="delegation" class="form-label">Delegation</label>
+                                        <input type="text" class="form-control" id="delegation" name="delegation" 
+                                               placeholder="Enter delegation">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="locality" class="form-label">Locality</label>
+                                        <input type="text" class="form-control" id="locality" name="locality" 
+                                               placeholder="Enter locality/neighborhood">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Property Details -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-ruler-combined me-2"></i>Property Details</h5>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="living_area" class="form-label">Living Area (m²)</label>
+                                        <input type="number" class="form-control" id="living_area" name="living_area" 
+                                               placeholder="e.g. 150">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="land_area" class="form-label">Land Area (m²)</label>
+                                        <input type="number" class="form-control" id="land_area" name="land_area" 
+                                               placeholder="e.g. 300">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="room_count" class="form-label">Number of Rooms</label>
+                                        <input type="number" class="form-control" id="room_count" name="room_count" 
+                                               placeholder="e.g. 4" min="0" max="20">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="bathroom_count" class="form-label">Number of Bathrooms</label>
+                                        <input type="number" class="form-control" id="bathroom_count" name="bathroom_count" 
+                                               placeholder="e.g. 2" min="0" max="10">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="construction_year" class="form-label">Construction Year</label>
+                                        <input type="number" class="form-control" id="construction_year" name="construction_year" 
+                                               placeholder="e.g. 2020" min="1900" max="2030">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="floor" class="form-label">Floor</label>
+                                        <input type="number" class="form-control" id="floor" name="floor" 
+                                               placeholder="e.g. 2" min="0" max="50">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="condition" class="form-label">Condition</label>
+                                        <select class="form-select" id="condition" name="condition">
+                                            <option value="">Select condition</option>
+                                            <option value="Excellent">Excellent</option>
+                                            <option value="Very Good">Very Good</option>
+                                            <option value="Good">Good</option>
+                                            <option value="Fair">Fair</option>
+                                            <option value="Needs Renovation">Needs Renovation</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Features & Amenities -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-star me-2"></i>Features & Amenities</h5>
+                                <div class="checkbox-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="has_garage" name="has_garage">
+                                        <label class="form-check-label" for="has_garage">
+                                            <i class="fas fa-car me-2"></i>Garage
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="has_garden" name="has_garden">
+                                        <label class="form-check-label" for="has_garden">
+                                            <i class="fas fa-seedling me-2"></i>Garden
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="has_pool" name="has_pool">
+                                        <label class="form-check-label" for="has_pool">
+                                            <i class="fas fa-swimming-pool me-2"></i>Swimming Pool
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="has_balcony" name="has_balcony">
+                                        <label class="form-check-label" for="has_balcony">
+                                            <i class="fas fa-building me-2"></i>Balcony
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="has_terrace" name="has_terrace">
+                                        <label class="form-check-label" for="has_terrace">
+                                            <i class="fas fa-home me-2"></i>Terrace
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="heating" name="heating">
+                                        <label class="form-check-label" for="heating">
+                                            <i class="fas fa-thermometer-half me-2"></i>Heating
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="air_conditioning" name="air_conditioning">
+                                        <label class="form-check-label" for="air_conditioning">
+                                            <i class="fas fa-snowflake me-2"></i>Air Conditioning
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="furnished" name="furnished">
+                                        <label class="form-check-label" for="furnished">
+                                            <i class="fas fa-couch me-2"></i>Furnished
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Description -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-file-alt me-2"></i>Additional Description</h5>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Property Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" 
+                                              placeholder="Enter any additional details about the property..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Buttons -->
+                            <div class="text-center">
+                                <a href="/" class="btn btn-secondary me-3">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Scraper
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-chart-line me-2"></i>Analyze & Predict
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add some interactivity to the form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-calculate estimated values based on other inputs
+            const livingAreaInput = document.getElementById('living_area');
+            const roomCountInput = document.getElementById('room_count');
+            
+            // Simple validation
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const propertyType = document.getElementById('property_type').value;
+                const transactionType = document.getElementById('transaction_type').value;
+                
+                if (!propertyType || !transactionType) {
+                    e.preventDefault();
+                    alert('Please select both Property Type and Transaction Type');
+                    return false;
+                }
+            });
+            
+            // Add visual feedback for form sections
+            const formSections = document.querySelectorAll('.form-section');
+            formSections.forEach(section => {
+                const inputs = section.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', function() {
+                        section.style.borderLeftColor = '#667eea';
+                        section.style.borderLeftWidth = '6px';
+                    });
+                    input.addEventListener('blur', function() {
+                        section.style.borderLeftColor = '#667eea';
+                        section.style.borderLeftWidth = '4px';
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

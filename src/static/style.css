@@ -1,0 +1,72 @@
+/* Custom styles for Real Estate Scraper */
+
+.property-card {
+    transition: all 0.3s ease;
+    border-radius: 20px;
+}
+
+.property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+}
+
+.price-highlight {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+.status-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-success {
+    background: #28a745;
+    color: white;
+}
+
+.status-warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+@media (max-width: 768px) {
+    .card-header h1 {
+        font-size: 2rem !important;
+    }
+    
+    .property-price {
+        font-size: 2rem !important;
+    }
+    
+    .provider-card {
+        margin-bottom: 1rem;
+    }
+}

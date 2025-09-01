@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraping Results - Real Estate Scraper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .result-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 2rem;
+        }
+        
+        .property-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .property-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #28a745;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        
+        .photo-gallery {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .photo-gallery img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .photo-gallery img:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn-back {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+            color: white;
+        }
+        
+        .property-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .property-detail:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .detail-value {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .prediction-card {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .prediction-loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .prediction-result {
+            display: none;
+        }
+        
+        .prediction-result.show {
+            display: block;
+        }
+        
+        .price-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+        
+        .price-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .price-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .price-difference {
+            text-align: center;
+            padding: 0 1rem;
+        }
+        
+        .difference-arrow {
+            font-size: 1.5rem;
+            margin: 0 0.5rem;
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 2s ease;
+            width: 0%;
+        }
+        
+        .prediction-factors {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .factor-badge {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 15px;
+            padding: 0.25rem 0.75rem;
+            margin: 0.25rem;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Back Button -->
+                <div class="mb-4">
+                    <a href="/" class="btn btn-back">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Scraper
+                    </a>
+                </div>
+                
+                <!-- Results Card -->
+                <div class="card">
+                    <div class="result-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h1 class="property-title">
+                                    {% if data.property_type %}{{ data.property_type }} - {% endif %}
+                                    Property Details
+                                </h1>
+                                <p class="mb-2">
+                                    <i class="fas fa-globe me-2"></i>
+                                    Scraped from {{ provider.name }} ({{ provider.domain }})
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-clock me-2"></i>
+                                    {% if data.listing_date %}
+                                        Listed: {{ data.listing_date | format_date }}
+                                    {% else %}
+                                        Scraped just now
+                                    {% endif %}
+                                </p>
+                            </div>
+                            {% if data.price and data.price != 'nan' %}
+                            <div class="text-end">
+                                <div class="property-price">
+                                    {% if data.price and data.price != 'nan' %}
+                                        {{ data.price | format_number }}
+                                        {% if data.currency %} {{ data.currency }}{% endif %}
+                                    {% else %}
+                                        Price not available
+                                    {% endif %}
+                                </div>
+                                <small>{{ data.transaction_type | title if data.transaction_type else 'Price' }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Price Prediction Section -->
+                        <div class="prediction-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-chart-line me-2"></i>Price Prediction Analysis
+                            </h5>
+                            
+                            <div id="prediction-loading" class="prediction-loading">
+                                <div class="spinner-border spinner-border-sm me-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                Analyzing property and generating price prediction...
+                            </div>
+                            
+                            <div id="prediction-result" class="prediction-result">
+                                <div class="price-comparison">
+                                    <div class="price-item">
+                                        <div class="price-label">Listed Price</div>
+                                        <div class="price-value" id="listed-price">
+                                            {% if data.price and data.price != 'nan' %}
+                                                {{ data.price | format_number }}
+                                                {% if data.currency %} {{ data.currency }}{% endif %}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="price-difference">
+                                        <div class="difference-arrow" id="price-arrow">⟷</div>
+                                        <small id="difference-text">Calculating...</small>
+                                    </div>
+                                    <div class="price-item">
+                                        <div class="price-label">Predicted Price</div>
+                                        <div class="price-value" id="predicted-price">Loading...</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <small>Confidence: <span id="confidence-percent">0</span>%</small>
+                                </div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" id="confidence-fill"></div>
+                                </div>
+                                
+                                <div class="prediction-factors">
+                                    <h6 class="mb-2">Key Factors Considered:</h6>
+                                    <div id="prediction-factors">
+                                        <span class="factor-badge">Location</span>
+                                        <span class="factor-badge">Property Size</span>
+                                        <span class="factor-badge">Property Type</span>
+                                        <span class="factor-badge">Market Trends</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Property Information -->
+                            <div class="col-lg-8">
+                                <!-- Basic Details -->
+                                <div class="info-card">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>Property Information
+                                    </h5>
+                                    
+                                    {% if data.address %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Address
+                                        </span>
+                                        <span class="detail-value">{{ data.address }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.governorate and data.governorate != 'nan' %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-map me-2"></i>Governorate
+                                        </span>
+                                        <span class="detail-value">{{ data.governorate }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.delegation %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-building me-2"></i>Delegation
+                                        </span>
+                                        <span class="detail-value">{{ data.delegation }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.locality %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-location-dot me-2"></i>Locality
+                                        </span>
+                                        <span class="detail-value">{{ data.locality }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.living_area and data.living_area != 'nan' %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-ruler-combined me-2"></i>Living Area
+                                        </span>
+                                        <span class="detail-value">{{ data.living_area }} m²</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.land_area %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-ruler me-2"></i>Land Area
+                                        </span>
+                                        <span class="detail-value">{{ data.land_area }} m²</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.room_count %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-bed me-2"></i>Rooms
+                                        </span>
+                                        <span class="detail-value">{{ data.room_count }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.bathroom_count %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-bath me-2"></i>Bathrooms
+                                        </span>
+                                        <span class="detail-value">{{ data.bathroom_count }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Features & Amenities -->
+                                {% if data.has_garage or data.has_garden or data.has_pool or data.has_balcony or data.has_terrace or data.heating or data.air_conditioning or data.furnished %}
+                                <div class="info-card">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-list-check me-2"></i>Features & Amenities
+                                    </h5>
+                                    <div>
+                                        {% if data.has_garage %}<span class="feature-badge"><i class="fas fa-warehouse me-1"></i>Garage</span>{% endif %}
+                                        {% if data.has_garden %}<span class="feature-badge"><i class="fas fa-leaf me-1"></i>Garden</span>{% endif %}
+                                        {% if data.has_pool %}<span class="feature-badge"><i class="fas fa-swimmer me-1"></i>Pool</span>{% endif %}
+                                        {% if data.has_balcony %}<span class="feature-badge"><i class="fas fa-building me-1"></i>Balcony</span>{% endif %}
+                                        {% if data.has_terrace %}<span class="feature-badge"><i class="fas fa-umbrella-beach me-1"></i>Terrace</span>{% endif %}
+                                        {% if data.heating %}<span class="feature-badge"><i class="fas fa-fire me-1"></i>Heating</span>{% endif %}
+                                        {% if data.air_conditioning %}<span class="feature-badge"><i class="fas fa-snowflake me-1"></i>AC</span>{% endif %}
+                                        {% if data.furnished %}<span class="feature-badge"><i class="fas fa-couch me-1"></i>Furnished</span>{% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Description -->
+                                {% if data.description %}
+                                <div class="info-card">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-file-text me-2"></i>Description
+                                    </h5>
+                                    <div class="description-text">
+                                        {% for line in data.description %}
+                                            <p class="mb-2">{{ line }}</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Contact Information -->
+                                {% if data.phone or data.agency %}
+                                <div class="info-card">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-address-book me-2"></i>Contact Information
+                                    </h5>
+                                    
+                                    {% if data.agency %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-store me-2"></i>Agency
+                                        </span>
+                                        <span class="detail-value">{{ data.agency }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if data.phone %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">
+                                            <i class="fas fa-phone me-2"></i>Phone
+                                        </span>
+                                        <span class="detail-value">
+                                            {% for phone in data.phone %}
+                                                <a href="tel:{{ phone }}" class="text-decoration-none">{{ phone }}</a>
+                                                {% if not loop.last %}<br>{% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Photos Section -->
+                            <div class="col-lg-4">
+                                {% if data.photos %}
+                                <div class="info-card">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-images me-2"></i>Photos ({{ data.photos | length }})
+                                    </h5>
+                                    <div class="photo-gallery">
+                                        {% for photo in data.photos[:6] %}
+                                        <div class="mb-3">
+                                            <img src="{{ photo }}" alt="Property photo" class="img-fluid rounded" 
+                                                 style="cursor: pointer;" onclick="openImageModal('{{ photo }}')">
+                                        </div>
+                                        {% endfor %}
+                                        {% if data.photos | length > 6 %}
+                                        <p class="text-muted text-center">
+                                            +{{ data.photos | length - 6 }} more photos
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Quick Stats -->
+                                <div class="info-card">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-chart-bar me-2"></i>Quick Stats
+                                    </h5>
+                                    
+                                    <div class="property-detail">
+                                        <span class="detail-label">Listing ID</span>
+                                        <span class="detail-value">{{ data.id or 'N/A' }}</span>
+                                    </div>
+                                    
+                                    <div class="property-detail">
+                                        <span class="detail-label">Source</span>
+                                        <span class="detail-value">{{ data.source | title }}</span>
+                                    </div>
+                                    
+                                    <div class="property-detail">
+                                        <span class="detail-label">Transaction Type</span>
+                                        <span class="detail-value">{{ data.transaction_type | title if data.transaction_type else 'N/A' }}</span>
+                                    </div>
+                                    
+                                    {% if data.features %}
+                                    <div class="property-detail">
+                                        <span class="detail-label">Additional Features</span>
+                                        <span class="detail-value">{{ data.features | length }} items</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="info-card">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-download me-2"></i>Export Data
+                                    </h5>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary" onclick="downloadJSON()">
+                                            <i class="fas fa-file-code me-2"></i>Download JSON
+                                        </button>
+                                        <a href="{{ data.url }}" target="_blank" class="btn btn-outline-secondary">
+                                            <i class="fas fa-external-link-alt me-2"></i>View Original
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Property Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <img id="modalImage" src="" alt="Property photo" class="img-fluid w-100">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Image modal functionality
+        function openImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            new bootstrap.Modal(document.getElementById('imageModal')).show();
+        }
+        
+        // Download JSON functionality
+        function downloadJSON() {
+            const propertyData = JSON.parse('{{ data | tojson | safe }}');
+            const blob = new Blob([JSON.stringify(propertyData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `property_data_${propertyData.id || 'scraped'}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Price prediction functionality
+        async function loadPrediction() {
+            try {
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // For now, we'll use mock data. This will be replaced with actual API call
+                const predictionData = {
+                    predicted_price: 275000,
+                    confidence: 85,
+                    factors: ['Location Analysis', 'Market Trends', 'Property Features', 'Comparable Sales']
+                };
+                
+                // Hide loading, show results
+                document.getElementById('prediction-loading').style.display = 'none';
+                document.getElementById('prediction-result').classList.add('show');
+                
+                // Update predicted price
+                document.getElementById('predicted-price').textContent = 
+                    new Intl.NumberFormat('en-US').format(predictionData.predicted_price) + ' DT';
+                
+                // Update confidence
+                document.getElementById('confidence-percent').textContent = predictionData.confidence;
+                document.getElementById('confidence-fill').style.width = predictionData.confidence + '%';
+                
+                // Calculate difference
+                const listedPriceText = document.getElementById('listed-price').textContent;
+                const listedPrice = parseFloat(listedPriceText.replace(/[^\d.]/g, ''));
+                
+                if (!isNaN(listedPrice)) {
+                    const difference = predictionData.predicted_price - listedPrice;
+                    const percentDiff = ((difference / listedPrice) * 100).toFixed(1);
+                    
+                    let arrow, text, color;
+                    if (difference > 0) {
+                        arrow = '↗️';
+                        text = `+${Math.abs(percentDiff)}% above market`;
+                        color = '#28a745';
+                    } else if (difference < 0) {
+                        arrow = '↘️';
+                        text = `${Math.abs(percentDiff)}% below market`;
+                        color = '#dc3545';
+                    } else {
+                        arrow = '⟷';
+                        text = 'At market value';
+                        color = '#ffc107';
+                    }
+                    
+                    document.getElementById('price-arrow').textContent = arrow;
+                    document.getElementById('difference-text').textContent = text;
+                    document.getElementById('difference-text').style.color = color;
+                }
+                
+                // Update factors
+                const factorsContainer = document.getElementById('prediction-factors');
+                factorsContainer.innerHTML = predictionData.factors.map(factor => 
+                    `<span class="factor-badge">${factor}</span>`
+                ).join('');
+                
+            } catch (error) {
+                console.error('Error loading prediction:', error);
+                document.getElementById('prediction-loading').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle me-2"></i>Unable to load prediction';
+            }
+        }
+        
+        // Start prediction when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPrediction();
+        });
+    </script>
+</body>
+</html>
