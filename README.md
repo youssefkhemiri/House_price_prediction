@@ -33,6 +33,7 @@ House_price_prediction/
 │   ├── scrapers/                    # Web scraping modules
 │   │   ├── menzili_scraper.py      # Menzili website scraper
 │   │   ├── mubawab_scraper.py      # Mubawab website scraper
+│   │   ├── tecnocasa_scraper.py    # tcnocasa website scraper
 │   │   └── any_website_scraper.py   # Generic website scraper
 │   ├── templates/                   # HTML templates
 │   │   ├── index.html              # Main page
@@ -51,6 +52,7 @@ House_price_prediction/
 │       ├── celery_timer.py         # Celery task scheduler
 │       ├── menzili_crawler.py      # Menzili daily crawler
 │       ├── mubaweb_crawler.py      # Mubawab daily crawler
+│       ├── tecnocasa_crawler.py    # tecnocasa crawler
 │       ├── setup_celery.py         # Celery setup automation
 │       └── test_celery_system.py   # Celery system tests
 │
