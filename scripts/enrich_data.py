@@ -283,7 +283,7 @@ def main():
     )
     parser.add_argument(
         "--output", 
-        default=r"data\processed\enriched_real_estate_data.json",
+        default=r"data\processed\enriched_real_estate_dataV2-1.json",
         help="Output JSON file path"
     )
     parser.add_argument(
