@@ -34,7 +34,10 @@ except ModuleNotFoundError:
 BASE_URL_TEMPLATE = "https://www.mubawab.tn/en/ct/tunis/real-estate-for-sale:o:n:p:{page}"
 # PAGES_TO_FETCH = [1, 2, 3]
 PAGES_TO_FETCH = range(1, 7)  # pages 1..3
-OUTPUT_JSON_PATH = r"C:\Users\Razer\Documents\2025_work\House_price_prediction\data\raw\mubawab_listings.json"
+OUTPUT_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    "data", "raw", "mubawab_listings.json"
+)
 
 REQUEST_TIMEOUT = 20  # seconds
 SLEEP_BETWEEN_REQUESTS = 1.0  # politeness between page fetches

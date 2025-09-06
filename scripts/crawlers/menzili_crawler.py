@@ -27,7 +27,11 @@ except ModuleNotFoundError:
 
 
 LISTING_START_URL = "https://www.menzili.tn/immo/vente-maison-tunisie?page=1&tri=1"
-OUTPUT_JSON_PATH = r"C:\Users\Razer\Documents\2025_work\House_price_prediction\data\raw\menzili_listings.json"
+OUTPUT_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    "data", "raw", "menzili_listings.json"
+)
+
 PAGES_TO_SCAN = 30
 REQUEST_TIMEOUT = (10, 25)  # (connect, read)
 HEADERS = {

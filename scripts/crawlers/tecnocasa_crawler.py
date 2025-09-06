@@ -267,7 +267,12 @@ def crawl_tecnocasa_selenium() -> List[Dict]:
 # ---------- CLI ----------
 if __name__ == "__main__":
     rows = crawl_tecnocasa_selenium()
-    with open("tecnocasa_listings.json", "w", encoding="utf-8") as f:
+    
+    OUTPUT_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    "data", "raw", "tecnocasa_listings.json")
+
+    with open(OUTPUT_JSON_PATH, "w", encoding="utf-8") as f:
         json.dump(rows, f, ensure_ascii=False, indent=2)
     with open("tecnocasa_listings.ndjson", "w", encoding="utf-8") as f:
         for r in rows:

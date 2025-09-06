@@ -155,3 +155,7 @@ Thumbs.db
 
 data/*
 z_junk/*
+notebooks/before_enriched_real_estate_data.json
+logs/system_test.jsonl
+scripts/crawlers/setup_celery.py
+scripts/crawlers/test_celery_system.py
