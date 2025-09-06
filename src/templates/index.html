@@ -72,12 +72,12 @@
         .provider-card {
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            padding: 1rem;
+            padding: 0.75rem;
             transition: all 0.3s ease;
             cursor: pointer;
             background: white;
             text-align: center;
-            min-height: 140px;
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -95,21 +95,39 @@
         }
         
         .provider-icon {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: #667eea;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
         
         .provider-name {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
         
         .provider-description {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #6c757d;
             margin-bottom: 0;
+        }
+        
+        .provider-card[data-provider="tecnocasa"] {
+            border-color: #dc3545;
+        }
+        
+        .provider-card[data-provider="tecnocasa"]:hover {
+            border-color: #dc3545;
+            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.2);
+        }
+        
+        .provider-card[data-provider="tecnocasa"].selected {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.1) 100%);
+        }
+        
+        .provider-card[data-provider="tecnocasa"] .provider-icon {
+            color: #dc3545;
         }
         
         .provider-card[data-provider="any_website"] {
@@ -224,7 +242,7 @@
                                 </label>
                                 <div class="row d-flex align-items-stretch">
                                     {% for provider_id, provider_info in providers.items() %}
-                                    <div class="col-md-4 col-sm-6 mb-2 d-flex">
+                                    <div class="col-lg-3 col-md-6 col-sm-6 mb-2 d-flex">
                                         <div class="provider-card w-100" data-provider="{{ provider_id }}">
                                             <div class="provider-icon">
                                                 <i class="fas fa-{{ provider_info.icon if provider_info.icon else 'building' }}"></i>
@@ -349,7 +367,10 @@
                 const urlInput = document.getElementById('url');
                 const urlHelp = document.getElementById('urlHelp');
                 
-                if (provider === 'menzili') {
+                if (provider === 'tecnocasa') {
+                    urlInput.placeholder = 'https://www.tecnocasa.tn/vendre/...';
+                    urlHelp.textContent = 'Paste a Tecnocasa.tn property URL';
+                } else if (provider === 'menzili') {
                     urlInput.placeholder = 'https://www.menzili.tn/annonce/...';
                     urlHelp.textContent = 'Paste a Menzili.tn property URL';
                 } else if (provider === 'mubawab') {
@@ -386,6 +407,7 @@
             
             if (provider && url && provider !== 'any_website') {
                 const providerDomain = {
+                    'tecnocasa': 'tecnocasa.tn',
                     'menzili': 'menzili.tn',
                     'mubawab': 'mubawab.tn'
                 }[provider];

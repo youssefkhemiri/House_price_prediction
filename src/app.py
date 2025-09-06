@@ -9,6 +9,7 @@ from datetime import datetime
 from scrapers.menzili_scraper import scrape_menzili
 from scrapers.any_website_scraper import scrape_any_website
 from scrapers.mubawab_scraper import scrape_mubawab
+from scrapers.tecnocasa_scraper import scrape_tecnocasa
 import traceback
 import asyncio
 from typing import Optional
@@ -69,6 +70,12 @@ templates.env.filters['format_date'] = format_date
 
 # Supported website providers
 SUPPORTED_PROVIDERS = {
+    'tecnocasa': {
+        'name': 'Tecnocasa',
+        'domain': 'tecnocasa.tn',
+        'description': 'Tunisian real estate platform',
+        'icon': 'building'
+    },
     'menzili': {
         'name': 'Menzili',
         'domain': 'menzili.tn',
@@ -161,7 +168,9 @@ async def scrape_form(
                 })
         
         # Scrape based on provider
-        if provider == 'menzili':
+        if provider == 'tecnocasa':
+            data = scrape_tecnocasa(url)
+        elif provider == 'menzili':
             data = scrape_menzili(url)
         elif provider == 'mubawab':
             data = scrape_mubawab(url)
@@ -306,7 +315,9 @@ async def api_scrape(scrape_request: ScrapeRequest):
             url = 'https://' + url
         
         # Scrape based on provider
-        if provider == 'menzili':
+        if provider == 'tecnocasa':
+            data = scrape_tecnocasa(url)
+        elif provider == 'menzili':
             data = scrape_menzili(url)
         elif provider == 'mubawab':
             data = scrape_mubawab(url)

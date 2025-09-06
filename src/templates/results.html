@@ -288,6 +288,11 @@
                                 
                                 <div class="text-center">
                                     <small>Confidence: <span id="confidence-percent">0</span>%</small>
+                                    {% if prediction and prediction.price_range %}
+                                    <div class="mt-2">
+                                        <small class="text-light">Range: {{ "{:,}".format(prediction.price_range.min|int) }} - {{ "{:,}".format(prediction.price_range.max|int) }} TND</small>
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="confidence-bar">
                                     <div class="confidence-fill" id="confidence-fill"></div>
@@ -567,15 +572,15 @@
         // Price prediction functionality
         async function loadPrediction() {
             try {
-                // Simulate API call delay
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Get prediction data from backend (passed via Jinja2)
+                const predictionData = {% if prediction %}{{ prediction | tojson | safe }}{% else %}null{% endif %};
                 
-                // For now, we'll use mock data. This will be replaced with actual API call
-                const predictionData = {
-                    predicted_price: 275000,
-                    confidence: 85,
-                    factors: ['Location Analysis', 'Market Trends', 'Property Features', 'Comparable Sales']
-                };
+                if (!predictionData) {
+                    throw new Error('No prediction data available');
+                }
+                
+                // Simulate small delay for smooth UX
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 // Hide loading, show results
                 document.getElementById('prediction-loading').style.display = 'none';
@@ -583,11 +588,12 @@
                 
                 // Update predicted price
                 document.getElementById('predicted-price').textContent = 
-                    new Intl.NumberFormat('en-US').format(predictionData.predicted_price) + ' DT';
+                    new Intl.NumberFormat('en-US').format(predictionData.predicted_price) + ' TND';
                 
-                // Update confidence
-                document.getElementById('confidence-percent').textContent = predictionData.confidence;
-                document.getElementById('confidence-fill').style.width = predictionData.confidence + '%';
+                // Update confidence (convert from decimal to percentage if needed)
+                const confidence = predictionData.confidence > 1 ? predictionData.confidence : Math.round(predictionData.confidence * 100);
+                document.getElementById('confidence-percent').textContent = confidence;
+                document.getElementById('confidence-fill').style.width = confidence + '%';
                 
                 // Calculate difference
                 const listedPriceText = document.getElementById('listed-price').textContent;
@@ -619,9 +625,13 @@
                 
                 // Update factors
                 const factorsContainer = document.getElementById('prediction-factors');
-                factorsContainer.innerHTML = predictionData.factors.map(factor => 
-                    `<span class="factor-badge">${factor}</span>`
-                ).join('');
+                if (predictionData.factors && predictionData.factors.length > 0) {
+                    factorsContainer.innerHTML = predictionData.factors.map(factor => 
+                        `<span class="factor-badge">${factor}</span>`
+                    ).join('');
+                } else {
+                    factorsContainer.innerHTML = '<span class="factor-badge">Location Analysis</span><span class="factor-badge">Property Features</span><span class="factor-badge">Market Data</span>';
+                }
                 
             } catch (error) {
                 console.error('Error loading prediction:', error);
