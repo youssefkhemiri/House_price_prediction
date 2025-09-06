@@ -152,3 +152,6 @@ mlflow_artifacts/
 # OS
 .DS_Store
 Thumbs.db
+
+data/*
+z_junk/*
