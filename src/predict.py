@@ -13,7 +13,7 @@ from typing import Dict, Any, Optional
 
 # Path to the model files
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
-MODEL_FILE = os.path.join(MODEL_DIR, "best_model_20250906_043926.pkl")
+MODEL_FILE = os.path.join(MODEL_DIR, "best_model_20250923_115748.pkl")
 
 def load_model():
     """Load the trained model."""
